@@ -1,0 +1,29 @@
+.DS_Store
+
+# Human-in-the-loop çalışma dizinleri
+.hitl/
+
+# applications altındaki tüm .env dosyaları (örnekler hariç)
+applications/**/.env
+!applications/**/.env.example
+
+.claude/
+
+### VS Code ###
+.vscode/
+
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
