@@ -4,8 +4,9 @@ Spring Boot 4, Spring Ai 2 ile Agentic Planning with TodoWriteTool deneyimlemek 
 
 spring-ai-workspace/applications/todowritetool projeyi oluşturdum.
 
+Kullanıcı burada olduğu gibi mesajı göndersin ve TodoWrite kullanarak görevlerinizi organize edin.
+- Find the top 10 Tom Hanks movies, group them in pairs, and print each title reversed. Use TodoWrite to organize your tasks.
 
-Beraber bir senaryo oluşturalım.
 
 https://spring.io/blog/2026/01/20/spring-ai-agentic-patterns-3-todowrite
 
