@@ -1,0 +1,29 @@
+server:
+  port: 6666
+
+spring:
+  application:
+    name: ai-demo-application
+
+  ai:
+    # Using OpenAI model here; alternatively, Alibaba Cloud Bailian platform can be used, which is integrated into Spring AI Alibaba
+    openai:
+      # OpenAI API key
+      api-key: ${OPENAI_API_KEY}
+      # Enter the OpenAI API endpoint URL, or a proxy provider's URL
+      base-url: https://api.openai.com
+      # Chat model configuration
+      chat:
+        options:
+          model: gpt-4o-mini
+          max-tokens: 4096
+        completions-path: /v1/chat/completions
+      # Embedding model configuration, used for text vectorization
+      embedding:
+        options:
+          model: text-embedding-3-small
+
+# Custom web search tool API, using Tavily here
+tavily:
+  api-key: ${TAVILY_API_KEY}
+  base-url: https://api.tavily.com

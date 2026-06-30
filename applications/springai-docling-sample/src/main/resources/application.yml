@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: springai-docling-sample
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+      embedding:
+        options:
+          model: text-embedding-3-small
+    vectorstore:
+      pgvector:
+        dimensions: 1536
+        index-type: hnsw
+        initialize-schema: true
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:15432}/${POSTGRES_DB:vectordb}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+
+# Arconia Docling Configuration
+arconia:
+  docling:
+    base-url: ${DOCLING_URL:http://localhost:5001}
+    connect-timeout: 10s
+    read-timeout: 10m
+
+# Actuator Configuration
+management:
+  endpoint:
+    health:
+      show-components: always
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+# Logging
+logging:
+  level:
+    com.example.docling: DEBUG
+    org.springframework.ai: INFO

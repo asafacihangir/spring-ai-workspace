@@ -1,0 +1,168 @@
+version: '3'
+
+vars:
+  GOOS: "{{default OS .GOOS}}"
+  MVNW: '{{if eq .GOOS "windows"}}mvnw.cmd{{else}}./mvnw{{end}}'
+  DC_FILE: "docker-compose.yml"
+  SLEEP_CMD: '{{if eq .GOOS "windows"}}timeout{{else}}sleep{{end}}'
+
+tasks:
+  default:
+    desc: "Run tests"
+    cmds:
+      - task: test
+
+  # === Environment Tasks ===
+
+  env:load:
+    desc: "Load environment variables from .env file"
+    cmds:
+      - |
+        if [ -f .env ]; then
+          echo "Loading .env file..."
+          set -a
+          source .env
+          set +a
+          echo "Environment variables loaded successfully"
+        else
+          echo "Warning: .env file not found"
+          exit 1
+        fi
+
+  env:check:
+    desc: "Check if required environment variables are set"
+    cmds:
+      - |
+        # Load .env if exists
+        if [ -f .env ]; then
+          set -a; source .env; set +a
+        fi
+        echo "Checking environment variables..."
+        if [ -z "$OPENAI_API_KEY" ]; then
+          echo "❌ OPENAI_API_KEY is not set"
+          exit 1
+        else
+          echo "✅ OPENAI_API_KEY is set"
+        fi
+        if [ -z "$TAVILY_API_KEY" ]; then
+          echo "⚠️  TAVILY_API_KEY is not set (web search will be disabled)"
+        else
+          echo "✅ TAVILY_API_KEY is set"
+        fi
+
+  env:show:
+    desc: "Show current environment configuration (masked)"
+    cmds:
+      - |
+        # Load .env if exists
+        if [ -f .env ]; then
+          set -a; source .env; set +a
+        fi
+        echo "=== Environment Configuration ==="
+        if [ -n "$OPENAI_API_KEY" ]; then
+          echo "OPENAI_API_KEY: ${OPENAI_API_KEY:0:10}...${OPENAI_API_KEY: -4}"
+        else
+          echo "OPENAI_API_KEY: (not set)"
+        fi
+        if [ -n "$TAVILY_API_KEY" ]; then
+          echo "TAVILY_API_KEY: ${TAVILY_API_KEY:0:10}...${TAVILY_API_KEY: -4}"
+        else
+          echo "TAVILY_API_KEY: (not set)"
+        fi
+
+  env:export:
+    desc: "Export environment variables (run with: eval $(task env:export))"
+    silent: true
+    cmds:
+      - |
+        if [ -f .env ]; then
+          grep -v '^#' .env | grep -v '^$' | sed 's/^/export /'
+        fi
+
+  # === Docker Compose Tasks ===
+
+  db:up:
+    desc: "Start PostgreSQL with pgvector"
+    cmds:
+      - "docker compose -f {{.DC_FILE}} up -d"
+      - task: db:wait
+
+  db:down:
+    desc: "Stop and remove PostgreSQL container"
+    cmds:
+      - "docker compose -f {{.DC_FILE}} down"
+
+  db:stop:
+    desc: "Stop PostgreSQL container (keep data)"
+    cmds:
+      - "docker compose -f {{.DC_FILE}} stop"
+
+  db:logs:
+    desc: "Show PostgreSQL logs"
+    cmds:
+      - "docker compose -f {{.DC_FILE}} logs -f postgres"
+
+  db:wait:
+    desc: "Wait for PostgreSQL to be ready"
+    cmds:
+      - |
+        echo "Waiting for PostgreSQL to be ready..."
+        until docker compose -f {{.DC_FILE}} exec -T postgres pg_isready -U postgres > /dev/null 2>&1; do
+          echo "PostgreSQL is not ready yet..."
+          {{.SLEEP_CMD}} 2
+        done
+        echo "PostgreSQL is ready!"
+
+  db:reset:
+    desc: "Reset PostgreSQL (delete all data)"
+    cmds:
+      - "docker compose -f {{.DC_FILE}} down -v"
+      - task: db:up
+
+  # === Application Tasks ===
+
+  build:
+    desc: "Build the application"
+    cmds:
+      - "{{.MVNW}} clean package -DskipTests"
+
+  test:
+    desc: "Run unit tests"
+    cmds:
+      - "{{.MVNW}} test"
+
+  test:integration:
+    desc: "Run integration tests"
+    cmds:
+      - "{{.MVNW}} test -Pintegration-test"
+
+  run:
+    desc: "Run the application (requires db:up first)"
+    deps: [build, env:check]
+    cmds:
+      - "{{.MVNW}} spring-boot:run"
+
+  dev:
+    desc: "Start database and run application"
+    cmds:
+      - task: env:check
+      - task: db:up
+      - task: run
+
+  # === Utility Tasks ===
+
+  clean:
+    desc: "Clean build artifacts"
+    cmds:
+      - "{{.MVNW}} clean"
+
+  sleep:
+    vars:
+      DURATION: "{{default 5 .DURATION}}"
+    cmds:
+      - "{{.SLEEP_CMD}} {{.DURATION}}"
+
+  health:
+    desc: "Check application health"
+    cmds:
+      - "curl -s http://localhost:8080/actuator/health | jq"
