@@ -1,0 +1,3 @@
+https://www.thomasvitale.com/ai-document-processing-docling-java-arconia-spring-boot/
+
+https://www.thomasvitale.com/rag-docling-java-spring-ai/
