@@ -7,6 +7,10 @@
 applications/**/.env
 !applications/**/.env.example
 
+# Referans amaçlı klonlanan harici repolar
+applications/a2a/spring-ai-a2a/
+applications/a2a/a2a-inspector/
+
 .claude/
 
 ### VS Code ###
