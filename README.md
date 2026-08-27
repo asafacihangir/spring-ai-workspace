@@ -14,6 +14,7 @@ Spring AI ile geliştirilen örnek uygulamaların bir araya getirildiği çalı�
 | [multi-agent-rag-spring](applications/multi-agent-rag-spring/README.md) | Adaptive RAG: soruyu yönlendiren, vector store veya web (Tavily) arasından kaynak seçen, yanıt kalitesini denetleyip yetersizse soruyu yeniden yazıp tekrar deneyen çok-ajanlı sistem. |
 | [embabel/blog-agent](applications/embabel/blog-agent/README.md) | Embabel Agent Framework ile GOAP tabanlı blog yazma agent'ı: outline → draft → review aşamalarını input/output tiplerinden otomatik plan çıkararak yürütür. |
 | [self-correcting-structured-output](applications/self-correcting-structured-output/README.md) | Spring AI 2.0 ile structured output: LLM yanıtını tipli Java nesnesine dönüştürür ve parse hatalarını kendi kendine düzelten mekanizmalarla güvenilirliği artırır. |
+| [react-pattern](applications/react-pattern/applications/app01/README.md) | ReAct (Reasoning + Acting) döngüsü: model `@Tool` ile işaretli tool'ları çağırır, sonucu gözlemler ve cevaba ulaşana kadar yeniden düşünür. |
 
 
 ## Kaynaklar
